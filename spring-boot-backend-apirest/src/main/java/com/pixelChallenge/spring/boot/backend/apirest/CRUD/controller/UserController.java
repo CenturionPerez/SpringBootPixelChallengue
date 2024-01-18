@@ -24,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/api/v1")
 public class UserController {
 	
+	private static final String REGISTER = "register";
+	private static final String UPDATE = "update";
+	
 	@Autowired
 	UserService userService;
 
@@ -40,36 +43,53 @@ public class UserController {
 	
 	@PostMapping("/verify") //Terminar de hacer el verify porque debemos pasarle email y password no el id
 	public ResponseEntity<ResponseSaveDto> verify(@RequestBody UserDto dto ) {
-		return this.proccesRequest(dto);
+        Map<String, Boolean> response = new HashMap<>();
+		try {
+			User user = this.userService.checkUser(dto);
+			return this.proccesRequest(user);
+		} catch (Exception e) {
+			response.put("data", false);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(this.prepareResponseSaveData(response));
+		}
+
 	}
 	
-	@PostMapping("/register")
+	@PostMapping(value = "/register" , consumes = "application/json")
 	public ResponseEntity<ResponseSaveDto> register(@RequestBody UserDto dto) {
-		return this.proccesRequest(dto);
+        Map<String, Boolean> response = new HashMap<>();
+		try {
+			User user = this.userService.insertOne(dto);
+			return this.proccesRequest(user);
+		} catch (Exception e) {
+			response.put("data", false);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(this.prepareResponseSaveData(response));
+		}
+
 	}
 	
 	@PutMapping("/update")
 	public ResponseEntity<ResponseSaveDto> update(@RequestBody UserDto dto) {
-		return this.proccesRequest(dto);
-	}
-	
-	private ResponseEntity<ResponseSaveDto> proccesRequest(UserDto dto) {
         Map<String, Boolean> response = new HashMap<>();
 		try {
-			User user = userService.insertOne(dto);
-			if(user != null) {
-				response.put("data", true);
-				return ResponseEntity.ok(this.prepareResponseSaveData(response));
-			}else {
-				response.put("data", true);
-				return ResponseEntity.ok(this.prepareResponseSaveData(response));
-			}
+			User user = this.userService.update(dto);
+			return this.proccesRequest(user);
 		} catch (Exception e) {
 			response.put("data", false);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(this.prepareResponseSaveData(response));
-		}	
+		}
 	}
 	
+	private ResponseEntity<ResponseSaveDto> proccesRequest(User user) {
+        Map<String, Boolean> response = new HashMap<>();
+		if(user != null) {
+			response.put("data", true);
+			return ResponseEntity.ok(this.prepareResponseSaveData(response));
+		}else {
+			response.put("data", false);
+			return ResponseEntity.ok(this.prepareResponseSaveData(response));
+		}
+	}
+		
 	private ResponseSaveDto prepareResponseSaveData(Map<String, Boolean> data) {
 		return new ResponseSaveDto(data);
 	}

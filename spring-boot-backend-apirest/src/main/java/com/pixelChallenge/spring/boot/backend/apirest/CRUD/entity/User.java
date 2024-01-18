@@ -13,18 +13,20 @@ public class User {
 	private String nationality;
 	private String rank;
 	private String password;
+	private String score;
 	
 	public User() {
 		
 	}
 
-	public User(int id, String name, String email, String nationality, String rank, String password) {
+	public User(int id, String name, String email, String nationality, String rank, String password, String score) {
 		this.id = id;
 		this.name = name;
 		this.email = email;
 		this.nationality = nationality;
 		this.rank = rank;
 		this.password = password;
+		this.score = score;
 	}
 
 	public int getId() {
@@ -74,6 +76,15 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public String getScore() {
+		return score;
+	}
+
+	public void setScore(String score) {
+		this.score = score;
+	}
+	
 	
 	
 	
