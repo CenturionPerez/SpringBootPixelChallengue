@@ -1,2 +1,2 @@
 # SpringBootPixelChallengue
-Spring boot application with integration NoSQL MongoDB 
+Spring boot application Pixelchallenge with integration NoSQL MongoDB 
