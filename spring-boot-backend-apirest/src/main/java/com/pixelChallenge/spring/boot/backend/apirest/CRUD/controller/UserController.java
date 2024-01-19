@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.info.ProjectInfoProperties.Build;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,60 +39,74 @@ public class UserController {
 	}
 	
 	@GetMapping("/user/{id}")
-	public ResponseEntity<User> getOne(@PathVariable("id") int id) {
-		return ResponseEntity.ok(userService.getOneById(id));
-	}
-	
-	@PostMapping("/verify") //Terminar de hacer el verify porque debemos pasarle email y password no el id
-	public ResponseEntity<ResponseSaveDto> verify(@RequestBody UserDto dto ) {
-        Map<String, Boolean> response = new HashMap<>();
+	public ResponseEntity<User> getOne(@PathVariable("id") String id) {
 		try {
-			User user = this.userService.checkUser(dto);
-			return this.proccesRequest(user);
+			User user = userService.getOneById(Integer.parseInt(id));
+			if(user != null) {
+				return ResponseEntity.ok(user);
+			}else {
+				return ResponseEntity.notFound().build();
+			}
 		} catch (Exception e) {
-			response.put("data", false);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(this.prepareResponseSaveData(response));
+			return ResponseEntity.internalServerError().build();
 		}
 
 	}
 	
-	@PostMapping(value = "/register" , consumes = "application/json")
+	@PostMapping("/verify")
+	public ResponseEntity<ResponseSaveDto> verify(@RequestBody UserDto dto ) {
+        Map<String, String> response = new HashMap<>();
+		try {
+			User user = this.userService.checkUser(dto);
+			return this.proccesRequest(user);
+		} catch (Exception e) {
+			return ResponseEntity.internalServerError().build();
+		}
+
+	}
+	
+	@PostMapping("/register")
 	public ResponseEntity<ResponseSaveDto> register(@RequestBody UserDto dto) {
-        Map<String, Boolean> response = new HashMap<>();
+        Map<String, String> response = new HashMap<>();
 		try {
 			User user = this.userService.insertOne(dto);
 			return this.proccesRequest(user);
 		} catch (Exception e) {
-			response.put("data", false);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(this.prepareResponseSaveData(response));
+			return ResponseEntity.internalServerError().build();
 		}
 
 	}
 	
 	@PutMapping("/update")
-	public ResponseEntity<ResponseSaveDto> update(@RequestBody UserDto dto) {
+	public ResponseEntity<Map<String, Boolean>> update(@RequestBody UserDto dto) {
         Map<String, Boolean> response = new HashMap<>();
 		try {
 			User user = this.userService.update(dto);
-			return this.proccesRequest(user);
+			if(user != null) {
+				response.put("data", true);
+				return ResponseEntity.ok(response);
+			}else {
+				response.put("data", false);
+				return ResponseEntity.ok(response);
+			}
+
 		} catch (Exception e) {
-			response.put("data", false);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(this.prepareResponseSaveData(response));
+			return ResponseEntity.internalServerError().build();
 		}
 	}
 	
 	private ResponseEntity<ResponseSaveDto> proccesRequest(User user) {
-        Map<String, Boolean> response = new HashMap<>();
+        Map<String, String> response = new HashMap<>();
 		if(user != null) {
-			response.put("data", true);
+			response.put("data", Integer.toString(user.getId()));
 			return ResponseEntity.ok(this.prepareResponseSaveData(response));
 		}else {
-			response.put("data", false);
+			response.put("data", "");
 			return ResponseEntity.ok(this.prepareResponseSaveData(response));
 		}
 	}
 		
-	private ResponseSaveDto prepareResponseSaveData(Map<String, Boolean> data) {
+	private ResponseSaveDto prepareResponseSaveData(Map<String, String> data) {
 		return new ResponseSaveDto(data);
 	}
 	

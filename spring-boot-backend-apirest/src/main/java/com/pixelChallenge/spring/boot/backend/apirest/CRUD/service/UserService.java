@@ -81,7 +81,8 @@ public class UserService {
 			dto.getNationality(),
 			dto.getRank(),
 			dto.getPassword(),
-			dto.getScore()
+			dto.getScore(),
+			dto.getMsisdn()
 		);
 	}
 	

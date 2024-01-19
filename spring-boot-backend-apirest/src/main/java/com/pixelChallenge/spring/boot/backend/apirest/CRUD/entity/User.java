@@ -14,12 +14,13 @@ public class User {
 	private String rank;
 	private String password;
 	private String score;
+	private String msisdn;
 	
 	public User() {
 		
 	}
 
-	public User(int id, String name, String email, String nationality, String rank, String password, String score) {
+	public User(int id, String name, String email, String nationality, String rank, String password, String score, String msisdn) {
 		this.id = id;
 		this.name = name;
 		this.email = email;
@@ -27,6 +28,7 @@ public class User {
 		this.rank = rank;
 		this.password = password;
 		this.score = score;
+		this.msisdn = msisdn;
 	}
 
 	public int getId() {
@@ -84,9 +86,13 @@ public class User {
 	public void setScore(String score) {
 		this.score = score;
 	}
-	
-	
-	
-	
+
+	public String getMsisdn() {
+		return msisdn;
+	}
+
+	public void setMsisdn(String msisdn) {
+		this.msisdn = msisdn;
+	}
 	
 }
