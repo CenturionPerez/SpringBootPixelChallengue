@@ -53,7 +53,7 @@ public class UserService {
 	
 	public User update(UserDto dto) {
 		User user = userRepository.findById(dto.getId()).orElse(null);
-		if(user != null) {
+		if(user == null) {
 			return null;
 		}else {
 			return userRepository.save(this.prepareValuesUserUpdate(user, dto));

@@ -8,9 +8,11 @@ import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.info.ProjectInfoProperties.Build;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException.BadRequest;
 
 import com.pixelChallenge.spring.boot.backend.apirest.CRUD.dto.ResponseSaveDto;
 import com.pixelChallenge.spring.boot.backend.apirest.CRUD.dto.UserDto;
@@ -81,16 +83,13 @@ public class UserController {
 	}
 	
 	@PutMapping("/update")
-	public ResponseEntity<Map<String, Boolean>> update(@RequestBody UserDto dto) {
-        Map<String, Boolean> response = new HashMap<>();
+	public ResponseEntity<ResponseSaveDto> update(@RequestBody UserDto dto) {
 		try {
 			User user = this.userService.update(dto);
 			if(user != null) {
-				response.put("data", true);
-				return ResponseEntity.ok(response);
+				return ResponseEntity.ok(prepareResponseSaveData(Boolean.toString(true)));
 			}else {
-				response.put("data", false);
-				return ResponseEntity.ok(response);
+				return ResponseEntity.internalServerError().build();
 			}
 
 		} catch (Exception e) {
@@ -99,18 +98,16 @@ public class UserController {
 	}
 	
 	private ResponseEntity<ResponseSaveDto> proccesRequest(User user) {
-        Map<String, String> response = new HashMap<>();
 		if(user != null) {
-			response.put("data", Integer.toString(user.getId()));
-			return ResponseEntity.ok(this.prepareResponseSaveData(response));
+			return ResponseEntity.ok(this.prepareResponseSaveData(Integer.toString(user.getId())));
 		}else {
-			response.put("data", "");
-			return ResponseEntity.ok(this.prepareResponseSaveData(response));
+			return ResponseEntity.ok(this.prepareResponseSaveData(""));
 		}
 	}
 		
-	private ResponseSaveDto prepareResponseSaveData(Map<String, String> data) {
-		return new ResponseSaveDto(data);
+	private ResponseSaveDto prepareResponseSaveData(String value) {
+		ResponseSaveDto responseSaveDto = new ResponseSaveDto(value);
+		return responseSaveDto;
 	}
 	
 
