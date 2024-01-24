@@ -101,7 +101,7 @@ public class UserController {
 		if(user != null) {
 			return ResponseEntity.ok(this.prepareResponseSaveData(Integer.toString(user.getId())));
 		}else {
-			return ResponseEntity.ok(this.prepareResponseSaveData(""));
+			return ResponseEntity.internalServerError().build();
 		}
 	}
 		
