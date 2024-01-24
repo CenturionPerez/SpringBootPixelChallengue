@@ -1,9 +1,13 @@
 package com.pixelChallenge.spring.boot.backend.apirest.CRUD.service;
 
+import java.io.Console;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.VariableOperators.Let;
 import org.springframework.stereotype.Service;
 
 import com.pixelChallenge.spring.boot.backend.apirest.CRUD.dto.UserDto;
@@ -16,7 +20,23 @@ public class UserService {
 	UserRepository userRepository;
 	
 	public List<User> getAll() {
-		return userRepository.findAll();
+		List<User> userList = userRepository.findAll();
+		if(!userList.isEmpty()) {
+			userList = userList.stream().sorted(Comparator.comparingInt(user -> {
+				if(!user.getScore().isEmpty()) {
+					return -Integer.parseInt(user.getScore());
+				}
+				return 0;
+			})).collect(Collectors.toList());
+			
+			Integer counter = 0;
+			for (User user : userList) {
+				user.setRank(String.valueOf(counter++));
+				System.out.println("Score->: "+user.getScore()+ " and rank->: "+user.getRank());
+			}
+			return userRepository.saveAll(userList);
+		}
+		return Collections.emptyList() ;
 	}
 	
 	public User getOneById(int id) {
